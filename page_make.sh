@@ -259,6 +259,3 @@ Looking For Group
 </body>
 </html>
 '> index.html
-
-
-
