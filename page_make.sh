@@ -149,7 +149,8 @@ if [ "$PANEW" == "$PAOLD" ];then
   echo "PA Same"
 else
   echo $PANEW >saved_data/pa
-  wget -O images/pa.jpg $PANEW >/dev/null 2>&1
+  #wget -O images/pa.jpg $PANEW >/dev/null 2>&1
+  curl -o images/pa.jpg $PANEW >/dev/null 2>&1
 fi
 
 
