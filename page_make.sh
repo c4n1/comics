@@ -150,7 +150,8 @@ if [ "$PANEW" == "$PAOLD" ];then
 else
   echo $PANEW >saved_data/pa
   #wget -O images/pa.jpg $PANEW >/dev/null 2>&1
-  curl -o images/pa.jpg $PANEW >/dev/null 2>&1
+ images/pa.jpg $PANEW >/dev/null 2>&1
+  lurl -o images/pa.jpg $PANEW >/dev/null 2>&1
 fi
 
 
@@ -177,86 +178,152 @@ else
 fi
 
 
+EXPIRETIME=`date --date="14 minutes" +%a," "%d" "%b" "%Y" "%H:%M:%S" "%Z`
 
 
-#Build the html
 echo '
 <html>
 <body>
 <Title>Comics Page</Title>
 
 
+<meta http-equiv="cache-control" content="no-cache, must-revalidate, post-check=0, pre-check=0">
+<meta http-equiv="expires" content="'$EXPIRETIME'">
+<meta http-equiv="pragma" content="no-cache">
+
+
 <font size="6">
 
-XKCD
-<br>
-<font size="2">
-'$XKCDTITLE'
-<br>
-<img src="images/xkcd.png">
-<br>
-'$XKCDMO'
-</font>
-<br><br><br>
+' >index.html
 
 
-Dilbert
-<br>
-<img src="images/dilbert.gif">
-<br><br><br>
+for image in $( ls -t images);do
+  
+  if [ "$image" == "d2.jpg" ];then
+    echo '
+
+    D20 Monkey
+    <br>
+    <img src="images/d2.jpg">
+    <font size="2">'$D2MO'</font>
+    <br><br><br>
+
+    ' >>index.html
+  fi
+
+  if [ "$image" == "dilbert.jpg" ];then
+      echo '
+
+    Dilbert
+    <br>
+    <img src="images/dilbert.gif">
+    <br><br><br>
 
 
-Dungeon Running
-<br>
-<img src="images/dr.png">
-<br><br><br>
+    ' >>index.html
+  fi
+
+  if [ "$image" == "dr.png" ];then
+    echo '
+
+    Dungeon Running
+    <br>
+    <img src="images/dr.png">
+    <br><br><br>
+
+    ' >>index.html
+  fi
+  
+  if [ "$image" == "lfg.jpg" ];then
+    echo '
+
+    Looking For Group
+    <br>
+    <img src="images/lfg.jpg">
+    <br><br><br>
+
+    ' >>index.html
+  fi
+  
+  if [ "$image" == "oglaf.jpg" ];then
+    echo '
+
+    Oglaf
+    <br>
+    <img src="images/oglaf.jpg">
+    <br><br><br>
+
+    ' >>index.html 
+ fi
+  
+  if [ "$image" == "oots.png" ];then
+    echo '
+
+    The Order of The Stick
+    <br>
+    <img src="images/oots.png">
+    <br><br><br>
 
 
-Penny Arcade
-<br>
-<img src="images/pa.jpg" width="'$PAWIDTH'">
-<br><br><br>
+    ' >>index.html
+  fi
 
+  if [ "$image" == "pa.jpg" ];then
+    echo '
 
-The Order of The Stick
-<br>
-<img src="images/oots.png">
-<br><br><br>
+    Penny Arcade
+    <br>
+    <img src="images/pa.jpg" width="'$PAWIDTH'">
+    <br><br><br>
 
+    ' >>index.html
+  fi
 
-Oglaf
-<br>
-<img src="images/oglaf.jpg">
-<br><br><br>
+  if [ "$image" == "qc.png" ];then
+    echo '
 
+    Questionable Content
+    <br>
+    <img src="images/qc.png">
+    <br><br><br>
 
-Questionable Content
-<br>
-<img src="images/qc.png">
-<br><br><br>
+    ' >>index.html
+  fi
 
+  if [ "$image" == "satw.png" ];then
+    echo '
 
-D20 Monkey
-<br>
-<img src="images/d2.jpg">
-<font size="2">'$D2MO'</font>
-<br><br><br>
+    Scandinavia and the World
+    <br>
+    <img src="images/satw.png">
+    <br><br><br>
 
+    ' >>index.html
+  fi
 
-Scandinavia and the World
-<br>
-<img src="images/satw.png">
-<br><br><br>
+  if [ "$image" == "xkcd.png" ];then
+    echo '
 
+    XKCD
+    <br>
+    <font size="2">
+    '$XKCDTITLE'
+    <br>
+    <img src="images/xkcd.png">
+    <br>
+    '$XKCDMO'
+    </font>
+    <br><br><br>
 
-Looking For Group
-<br>
-<img src="images/lfg.jpg">
-<br><br><br>
+    ' >>index.html
+  fi
 
+done
+
+echo '
 </font>
 
 
 </body>
 </html>
-'> index.html
+'>>index.html
