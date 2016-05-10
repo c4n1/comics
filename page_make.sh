@@ -150,8 +150,8 @@ if [ "$PANEW" == "$PAOLD" ];then
 else
   echo $PANEW >saved_data/pa
   #wget -O images/pa.jpg $PANEW >/dev/null 2>&1
- images/pa.jpg $PANEW >/dev/null 2>&1
-  lurl -o images/pa.jpg $PANEW >/dev/null 2>&1
+  #images/pa.jpg $PANEW >/dev/null 2>&1
+  curl -o images/pa.jpg $PANEW >/dev/null 2>&1
 fi
 
 
@@ -176,6 +176,43 @@ else
   echo $QCNEW >saved_data/qc
   wget -O images/qc.png $QCNEW >/dev/null 2>&1
 fi
+
+
+
+#Manly Guys Doing Manly Things
+MGMTOLD=`cat saved_data/mgmt`
+MGMTNEW=`curl -s http://thepunchlineismachismo.com/ |grep -A2 comic-table |tail -n1 |cut -d'"' -f2`
+if [ "$MGMTOLD" == "$MGMTNEW" ];then
+  echo "MGMT Same"
+else
+  echo $MGMTNEW >saved_data/mgmt
+  wget -O images/mgmt.jpg $MGMTNEW >/dev/null 2>&1
+fi
+
+
+
+#MA3
+MA3OLD=`cat saved_data/ma3`
+MA3NEW=`curl -s -L http://www.ma3comic.com |grep 'http://zii.ma3comic.com/comics/' |cut -d'"' -f2`
+if [ "$MA3OLD" == "$MA3NEW" ];then
+  echo "MA3 Same"
+else
+  echo $MA3NEW >saved_data/ma3
+  wget -U 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0' -O images/ma3.png $MA3NEW >/dev/null 2>&1
+fi
+
+
+#Misfile
+MFOLD=`cat saved_data/mf`
+MFNEW=`curl -s http://www.misfile.com/ |grep 'comics' |head -n1| cut -d\' -f6 | sed 's,^,http://www.misfile.com/,'`
+if [ "$MFOLD" == "$MFNEW" ];then
+  echo "Misfile Same"
+else
+  echo $MFNEW >saved_data/mf
+  wget -O images/mf.jpg $MFNEW >/dev/null 2>&1
+fi
+
+
 
 
 EXPIRETIME=`date --date="14 minutes" +%a," "%d" "%b" "%Y" "%H:%M:%S" "%Z`
@@ -317,6 +354,41 @@ for image in $( ls -t images);do
 
     ' >>index.html
   fi
+
+  if [ "$image" == "mgmt.jpg" ];then
+    echo '
+
+    Manly Guys Doing Manly Things
+    <br>
+    <img src="images/mgmt.jpg">
+    <br><br><br>
+
+    ' >>index.html
+  fi
+
+  if [ "$image" == "ma3.png" ];then
+    echo '
+
+    Menage a 3
+    <br>
+    <img src="images/ma3.png">
+    <br><br><br>
+
+    ' >>index.html
+  fi
+
+  if [ "$image" == "mf.jpg" ];then
+    echo '
+
+    Misfile
+    <br>
+    <img src="images/mf.jpg">
+    <br><br><br>
+
+    ' >>index.html
+  fi
+
+
 
 done
 
