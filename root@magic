@@ -238,77 +238,6 @@ fi
 
 
 
-#SMBC
-SMBCOLD=`cat saved_data/smbc`
-SMBCNEW=`curl -s http://www.smbc-comics.com/ |grep 'comics/../comics/' |head -n 1 |sed 's/^.*src/src/' |cut -d'"' -f2 |sed 's/^/http:\/\/www.smbc-comics.com\//'`
-if [ "$SMBCOLD" == "$SMBCNEW" ];then
-  echo "SMBC Same"
-else
-  echo $SMBCNEW >saved_data/smbc
-  wget -O images/smbc.png $SMBCNEW >/dev/null 2>&1
-fi
-
-
-
-#Dark Legacy
-DLCURRENT=`cat saved_data/dl`
-DLNEW=$((DLCURRENT + 1))
-DLURL=http://darklegacycomics.com/comics/$DLNEW.jpg
-if 404test $DLURL;then
-  wget -O images/dl.jpg $DLURL >/dev/null 2>&1
-  echo $DLNEW > saved_data/sl
-fi
-
-
-
-#Diesel Sweeties
-DSOLD=`cat saved_data/ds`
-DSNEW=`curl -s http://www.dieselsweeties.com/ |grep xomic |head -n1 |sed 's/^.*src=//' |cut -d'"' -f2 |sed 's/^/http:\/\/www.dieselsweeties.com/'`
-if [ "$DSOLD" == "$DSNEW" ];then
-  echo "Diesel Sweeties Same"
-else
-  echo $DSNEW >saved_data/ds
-  wget -O images/ds.png $DSNEW >/dev/null 2>&1
-fi
-
-
-
-#PHD Comics
-PHDOLD=`cat saved_data/phd`
-PHDNEW=`curl -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" http://phdcomics.com/comics.php |grep '/comics/archive/' |head -n1 |cut -d'"' -f4`
-if [ "$PHDOLD" == "$PHDNEW" ];then
-  echo "PHD Same"
-else
-  echo $PHDNEW >saved_data/phd
-  wget -U 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0' -O images/phd.gif $PHDNEW >/dev/null 2>&1
-fi
-
-
-
-#Commit Strip
-CSOLD=`cat saved_data/cs`
-CSNEW=`curl -s http://www.commitstrip.com/en/? |head -n 30 |tail -n1 |cut -d'"' -f4 |xargs curl -s |grep 'wp-content/uploads' |tail -n2 |head -n1 |cut -d'"' -f2`
-if [ "$CSOLD" == "$CSNEW" ];then
-  echo "Commit Strip Same"
-else
-  echo $CSNEW >saved_data/cs
-  wget -O images/cs.jpg $CSNEW >/dev/null 2>&1
-fi
-
-
-
-#User Friendly
-UFOLD=`cat saved_data/uf`
-UFNEW=`curl -s http://www.userfriendly.org/ |grep 'Latest Strip' |cut -d'"' -f10`
-if [ "$UFOLD" == "$UFNEW" ];then
-  echo "User FriendlySame"
-else
-  echo $UFNEW >saved_data/uf
-  wget -O images/uf.gif $UFNEW >/dev/null 2>&1
-fi
-
-
-
 
 
 
@@ -345,7 +274,7 @@ for image in $( ls -t images);do
     ' >>index.html
   fi
 
-  if [ "$image" == "dilbert.gif" ];then
+  if [ "$image" == "dilbert.jpg" ];then
       echo '
 
     Dilbert
@@ -506,74 +435,6 @@ for image in $( ls -t images);do
 
     ' >>index.html
   fi
-
-  if [ "$image" == "smbc.png" ];then
-    echo '
-
-    SMBC
-    <br>
-    <img src="images/smbc.png">
-    <br><br><br>
-
-    ' >>index.html
-  fi
-
-  if [ "$image" == "dl.jpg" ];then
-    echo '
-
-    Dark Legacy
-    <br>
-    <img src="images/dl.jpg">
-    <br><br><br>
-
-    ' >>index.html
-  fi
-
-  if [ "$image" == "ds.png" ];then
-    echo '
-
-    Diesel Sweeties
-    <br>
-    <img src="images/ds.png">
-    <br><br><br>
-
-    ' >>index.html
-  fi
-
-  if [ "$image" == "phd.gif" ];then
-    echo '
-
-    PHD Comics
-    <br>
-    <img src="images/phd.gif">
-    <br><br><br>
-
-    ' >>index.html
-  fi
-
-  if [ "$image" == "cs.jpg" ];then
-    echo '
-
-    Commit Strip
-    <br>
-    <img src="images/cs.jpg">
-    <br><br><br>
-
-    ' >>index.html
-  fi
-
-  if [ "$image" == "uf.gif" ];then
-    echo '
-
-    User Friendly
-    <br>
-    <img src="images/uf.gif">
-    <br><br><br>
-
-    ' >>index.html
-  fi
-
-
 
 
 
