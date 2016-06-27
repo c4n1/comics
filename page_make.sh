@@ -118,7 +118,7 @@ fi
 
 
 #Dungeon Running
-DRIMG=`curl -s http://www.dungeonrunning.com/ |less |grep png |head -n5 |tail -n1 |cut -d'"' -f2`
+DRIMG=`curl -s http://www.dungeonrunning.com/ |grep png |head -n5 |tail -n1 |cut -d'"' -f2`
 DROLD=`cat saved_data/dr`
 if [ "$DRIMG" == "$DROLD" ];then
   echo "DR Same"
@@ -339,6 +339,16 @@ echo '
 <meta http-equiv="expires" content="'$EXPIRETIME'">
 <meta http-equiv="pragma" content="no-cache">
 
+<head>
+<style>
+
+img.resize90{
+   max-width:90%;
+}
+
+</style>
+</head>
+
 
 <font size="6">
 
@@ -376,7 +386,7 @@ for image in $( ls -t images);do
 
     Dungeon Running
     <br>
-    <img src="images/dr.png">
+    <img class="resize90" src="images/dr.png">
     <br><br><br>
 
     ' >>index.html
@@ -548,7 +558,7 @@ for image in $( ls -t images);do
 
     Diesel Sweeties
     <br>
-    <img src="images/ds.png">
+    <img class="resize90" src="images/ds.png">
     <br><br><br>
 
     ' >>index.html
