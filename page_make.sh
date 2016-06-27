@@ -73,8 +73,10 @@ LFGNEWNUM=$(($LFGOLD +1))
 LFGNEW="http://www.lfg.co/page/$LFGNEWNUM/"
 if 404test $LFGNEW;then
   echo $LFGNEWNUM > saved_data/lfg
-  LFGIMG=`curl -s $LFGNEW |grep jpg |head -n1 |cut -d'"' -f4`
-  wget -O images/lfg.jpg $LFGIMG >/dev/null 2>&1
+  LFGIMG=`curl -s $LFGNEW |grep -A1 '<div id="comic">' |tail -n1 |cut -d'"' -f2`
+  LFGIMGTYPE=`echo $LFGIMG |cut -d'.' -f4`
+  rm -f images/lfg*
+  wget -O images/lfg.$LFGIMGTYPE $LFGIMG >/dev/null 2>&1
 fi
   
 
@@ -228,7 +230,7 @@ fi
 
 #The Oatmeal
 OMOLD=`cat saved_data/om`
-OMNEW=`curl -s http://theoatmeal.com/comics |grep -A1 bg_comic |head -n2 |cut -d'"' -f2 |tail -n 1 |sed 's/^/http:\/\/theoatmeal.com/' |xargs curl -s  |grep -A13 meat |tail -n 1 |cut -d'"' -f2`
+OMNEW=`curl -s http://theoatmeal.com/comics |grep -A1 bg_comic |head -n2 |cut -d'"' -f2 |tail -n 1 |sed 's/^/http:\/\/theoatmeal.com/' |xargs curl -s  |grep -A13 meat |tail -n 1 |cut -d'"' -f6`
 if [ "$OMOLD" == "$OMNEW" ];then
   echo "Oatmeal Same"
 else
@@ -253,10 +255,10 @@ fi
 #Dark Legacy
 DLCURRENT=`cat saved_data/dl`
 DLNEW=$((DLCURRENT + 1))
-DLURL=http://darklegacycomics.com/comics/$DLNEW.jpg
+DLURL="http://darklegacycomics.com/comics/$DLNEW.jpg"
 if 404test $DLURL;then
   wget -O images/dl.jpg $DLURL >/dev/null 2>&1
-  echo $DLNEW > saved_data/sl
+  echo $DLNEW > saved_data/dl
 fi
 
 
@@ -287,7 +289,7 @@ fi
 
 #Commit Strip
 CSOLD=`cat saved_data/cs`
-CSNEW=`curl -s http://www.commitstrip.com/en/? |head -n 30 |tail -n1 |cut -d'"' -f4 |xargs curl -s |grep 'wp-content/uploads' |tail -n2 |head -n1 |cut -d'"' -f2`
+CSNEW=`curl -s http://www.commitstrip.com/en/? |grep og:url |cut -d'"' -f4 |xargs curl -s |grep -A1 '"entry-content' |tail -n1 |cut -d'"' -f2`
 if [ "$CSOLD" == "$CSNEW" ];then
   echo "Commit Strip Same"
 else
@@ -307,6 +309,18 @@ else
   wget -O images/uf.gif $UFNEW >/dev/null 2>&1
 fi
 
+
+
+
+#By The Book
+BTBOLD=`cat saved_data/btb`
+BTBNEW=`curl -s http://www.btbcomic.com/ |grep -A1 'id="comic"' |tail -n1 |cut -d'"' -f2`
+if [ "$BTBOLD" == "$BTBNEW" ];then
+  echo "By The Book"
+else
+  echo $BTBNEW >saved_data/btb
+  wget -O images/btb.jpg $BTBNEW >/dev/null 2>&1
+fi
 
 
 
@@ -368,12 +382,12 @@ for image in $( ls -t images);do
     ' >>index.html
   fi
   
-  if [ "$image" == "lfg.jpg" ];then
+  if [[ "$image" == *"lfg"* ]];then
     echo '
 
     Looking For Group
     <br>
-    <img src="images/lfg.jpg">
+    <img src="images/'$image'">
     <br><br><br>
 
     ' >>index.html
@@ -573,7 +587,16 @@ for image in $( ls -t images);do
     ' >>index.html
   fi
 
+  if [ "$image" == "btb.jpg" ];then
+    echo '
 
+    By The Book
+    <br>
+    <img src="images/btb.jpg">
+    <br><br><br>
+
+    ' >>index.html
+  fi
 
 
 
