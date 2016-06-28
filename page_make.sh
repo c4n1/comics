@@ -26,25 +26,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 README
 
+#Setting some vars for data locations these will work on my servers but not yours so change shit if you need
+#Note no trailing slash
+HOSTNAME=`hostname`
+if [[ "$HOSTNAME" = *oli02* ]];then
+  BASEDIR="/home/oli/Site_Build"
+elif [[ "$HOSTNAME" = magic ]];then
+  BASEDIR="/var/wwwcomic"
+elif [[ "$HOSTNAME" = *ovh01* ]];then
+  BASEDIR="/var/www/html/comics.ellie-oli.com"
+else 
+  BASEDIR=`pwd`
+  echo "Using working directory as base"
+fi
+
+
 
 function 404test {
   SITE=$1  
   curl -f $SITE >/dev/null 2>&1
   OUT=$?
   if  [ $OUT -eq 0 ];then
-    echo "found"
+    echo "found $SITE"
     return 0
   else
-    echo "not found"
+    echo "not found $SITE"
     return 1
   fi
 }
 
-
-#This is probably a better 404 test but I CBA to go back and edit the usage
-#function 404test {
-#  CODE=$(curl --write-out %{http_code} --silent --output /dev/null $1)
-#}
 
 #Order of the Stick 
 
@@ -56,27 +66,27 @@ function ootsgetimgurl {
   echo $COMIC
 }
 
-OOTSCURRENT=`cat saved_data/oots`
+OOTSCURRENT=`cat $BASEDIR/saved_data/oots`
 OOTSNEW=$((OOTSCURRENT + 1))
 OOTSURL=http://www.giantitp.com/comics/oots$OOTSNEW.html
 if 404test $OOTSURL;then
   OOTSIMGURL=`ootsgetimgurl $OOTSNEW`
-  wget -O images/oots.png $OOTSIMGURL >/dev/null 2>&1
-  echo $OOTSNEW > saved_data/oots
+  wget -O $BASEDIR/images/oots.png $OOTSIMGURL >/dev/null 2>&1
+  echo $OOTSNEW > $BASEDIR/saved_data/oots
 fi
 
 
 
 #Looking for Group
-LFGOLD=`cat saved_data/lfg`
+LFGOLD=`cat $BASEDIR/saved_data/lfg`
 LFGNEWNUM=$(($LFGOLD +1))
 LFGNEW="http://www.lfg.co/page/$LFGNEWNUM/"
 if 404test $LFGNEW;then
-  echo $LFGNEWNUM > saved_data/lfg
+  echo $LFGNEWNUM > $BASEDIR/saved_data/lfg
   LFGIMG=`curl -s $LFGNEW |grep -A1 '<div id="comic">' |tail -n1 |cut -d'"' -f2`
   LFGIMGTYPE=`echo $LFGIMG |cut -d'.' -f4`
-  rm -f images/lfg*
-  wget -O images/lfg.$LFGIMGTYPE $LFGIMG >/dev/null 2>&1
+  rm -f $BASEDIR/images/lfg*
+  wget -O $BASEDIR/images/lfg.$LFGIMGTYPE $LFGIMG >/dev/null 2>&1
 fi
   
 
@@ -86,240 +96,240 @@ curl -s xkcd.com > /tmp/xkcd.html
 XKCDIMG=`cat /tmp/xkcd.html |grep -A 1 'id="comic"' |tail -n1 |cut -d'"' -f2 |cut -c 3- `
 XKCDTITLE=`cat /tmp/xkcd.html |grep title |grep xkcd |head -n1 |cut -d":" -f2 |cut -c2- |cut -d"<" -f1`
 XKCDMO=`cat /tmp/xkcd.html |grep title |grep xkcd |cut -d'"' -f4`
-XKCDOLDTITLE=`cat saved_data/xkcd`
+XKCDOLDTITLE=`cat $BASEDIR/saved_data/xkcd`
 if [ "$XKCDOLDTITLE" == "$XKCDTITLE" ];then
   echo "XKCD Same"
 else
-  echo $XKCDTITLE > saved_data/xkcd
-  wget -O images/xkcd.png $XKCDIMG >/dev/null 2>&1
+  echo $XKCDTITLE > $BASEDIR/saved_data/xkcd
+  wget -O $BASEDIR/images/xkcd.png $XKCDIMG >/dev/null 2>&1
 fi
 
 
 #Dilbert
 DILBERTIMG=`curl -s http://dilbert.com/ |grep amuniversal |head -n 1 |cut -d'"' -f16`
-DILBERTOLD=`cat saved_data/dilbert`
+DILBERTOLD=`cat $BASEDIR/saved_data/dilbert`
 if [ "$DILBERTOLD" == "$DILBERTIMG" ];then
   echo "Dilbert Same"
 else
-  echo $DILBERTIMG > saved_data/dilbert
-  wget -O images/dilbert.gif $DILBERTIMG >/dev/null 2>&1
+  echo $DILBERTIMG > $BASEDIR/saved_data/dilbert
+  wget -O $BASEDIR/images/dilbert.gif $DILBERTIMG >/dev/null 2>&1
 fi
 
 
 #SATW
 SATWIMG=`curl -s http://satwcomic.com/the-world |grep -A 9 "1 of" |head -n 10 |tail -n 1 |cut -d'"' -f 4 |sed 's,150_thumb/,,g'`
-SATWOLD=`cat saved_data/satw`
+SATWOLD=`cat $BASEDIR/saved_data/satw`
 if [ "$SATWOLD" == "$SATWIMG" ];then
   echo "SATW Same"
 else
-  echo $SATWIMG > saved_data/satw
-  wget -O images/satw.png $SATWIMG >/dev/null 2>&1
+  echo $SATWIMG > $BASEDIR/saved_data/satw
+  wget -O $BASEDIR/images/satw.png $SATWIMG >/dev/null 2>&1
 fi
 
 
 #Dungeon Running
 DRIMG=`curl -s http://www.dungeonrunning.com/ |grep png |head -n5 |tail -n1 |cut -d'"' -f2`
-DROLD=`cat saved_data/dr`
+DROLD=`cat $BASEDIR/saved_data/dr`
 if [ "$DRIMG" == "$DROLD" ];then
   echo "DR Same"
 else
-  echo $DRIMG > saved_data/dr
-  wget -O images/dr.png $DRIMG >/dev/null 2>&1
+  echo $DRIMG > $BASEDIR/saved_data/dr
+  wget -O $BASEDIR/images/dr.png $DRIMG >/dev/null 2>&1
 fi
 
 
 
 #D20 Monkey
-D2IMGOLD=`cat saved_data/d2`
+D2IMGOLD=`cat $BASEDIR/saved_data/d2`
 D2IMG=`curl -s http://www.d20monkey.com/ |grep jpg |sed '2q;d' |cut -d'"' -f2`
 D2MO=`curl -s http://www.d20monkey.com/ |grep jpg |sed '2q;d' |cut -d'"' -f4`
 if [ "$D2IMG" == "$D2IMGOLD" ];then
   echo "D20 Monkey Same"
 else
-  echo $D2IMG >saved_data/d2
-  wget -O images/d2.jpg $D2IMG >/dev/null 2>&1
+  echo $D2IMG >$BASEDIR/saved_data/d2
+  wget -O $BASEDIR/images/d2.jpg $D2IMG >/dev/null 2>&1
 fi
 
 
 
 #Penny Arcade
 curl -s https://www.penny-arcade.com/comic >/tmp/pa.html
-PAOLD=`cat saved_data/pa`
+PAOLD=`cat $BASEDIR/saved_data/pa`
 PANEW=`cat /tmp/pa.html |grep "Pa-comics" |cut -d'"' -f4`
 PAWIDTH=`cat /tmp/pa.html |grep "Pa-comics" |cut -d'"' -f8`
 if [ "$PANEW" == "$PAOLD" ];then
   echo "PA Same"
 else
-  echo $PANEW >saved_data/pa
-  #wget -O images/pa.jpg $PANEW >/dev/null 2>&1
+  echo $PANEW >$BASEDIR/saved_data/pa
+  #wget -O $BASEDIR/images/pa.jpg $PANEW >/dev/null 2>&1
   #images/pa.jpg $PANEW >/dev/null 2>&1
-  curl -o images/pa.jpg $PANEW >/dev/null 2>&1
+  curl -o $BASEDIR/images/pa.jpg $PANEW >/dev/null 2>&1
 fi
 
 
 #Oglaf
-OGLAFOLD=`cat saved_data/oglaf`
+OGLAFOLD=`cat $BASEDIR/saved_data/oglaf`
 OGLAFNEW=`curl -s http://oglaf.com/ |head -n 1 |rev |cut -d '"' -f 2 |rev`
 if [ "$OGLAFNEW" == "$OGLAFOLD" ];then
   echo "Oglaf Same"
 else
-  echo $OGLAFNEW >saved_data/oglaf
-  wget -O images/oglaf.jpg $OGLAFNEW >/dev/null 2>&1
+  echo $OGLAFNEW >$BASEDIR/saved_data/oglaf
+  wget -O $BASEDIR/images/oglaf.jpg $OGLAFNEW >/dev/null 2>&1
 fi
 
 
 
 #QC
-QCOLD=`cat saved_data/qc`
+QCOLD=`cat $BASEDIR/saved_data/qc`
 QCNEW=`curl -s http://www.questionablecontent.net/ |grep comics |cut -d'"' -f2`
 if [ "$QCNEW" == "$QCOLD" ];then
   echo "QC Same"
 else
-  echo $QCNEW >saved_data/qc
-  wget -O images/qc.png $QCNEW >/dev/null 2>&1
+  echo $QCNEW >$BASEDIR/saved_data/qc
+  wget -O $BASEDIR/images/qc.png $QCNEW >/dev/null 2>&1
 fi
 
 
 
 #Manly Guys Doing Manly Things
-MGMTOLD=`cat saved_data/mgmt`
+MGMTOLD=`cat $BASEDIR/saved_data/mgmt`
 MGMTNEW=`curl -s http://thepunchlineismachismo.com/ |grep -A2 comic-table |tail -n1 |cut -d'"' -f2`
 if [ "$MGMTOLD" == "$MGMTNEW" ];then
   echo "MGMT Same"
 else
-  echo $MGMTNEW >saved_data/mgmt
-  wget -O images/mgmt.jpg $MGMTNEW >/dev/null 2>&1
+  echo $MGMTNEW >$BASEDIR/saved_data/mgmt
+  wget -O $BASEDIR/images/mgmt.jpg $MGMTNEW >/dev/null 2>&1
 fi
 
 
 
 #MA3
-MA3OLD=`cat saved_data/ma3`
+MA3OLD=`cat $BASEDIR/saved_data/ma3`
 MA3NEW=`curl -s -L http://www.ma3comic.com |grep 'http://zii.ma3comic.com/comics/' |cut -d'"' -f2`
 if [ "$MA3OLD" == "$MA3NEW" ];then
   echo "MA3 Same"
 else
-  echo $MA3NEW >saved_data/ma3
-  wget -U 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0' -O images/ma3.png $MA3NEW >/dev/null 2>&1
+  echo $MA3NEW >$BASEDIR/saved_data/ma3
+  wget -U 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0' -O $BASEDIR/images/ma3.png $MA3NEW >/dev/null 2>&1
 fi
 
 
 #Misfile
-MFOLD=`cat saved_data/mf`
+MFOLD=`cat $BASEDIR/saved_data/mf`
 MFNEW=`curl -s http://www.misfile.com/ |grep 'comics' |head -n1| cut -d\' -f6 | sed 's,^,http://www.misfile.com/,'`
 if [ "$MFOLD" == "$MFNEW" ];then
   echo "Misfile Same"
 else
-  echo $MFNEW >saved_data/mf
-  wget -O images/mf.jpg $MFNEW >/dev/null 2>&1
+  echo $MFNEW >$BASEDIR/saved_data/mf
+  wget -O $BASEDIR/images/mf.jpg $MFNEW >/dev/null 2>&1
 fi
 
 
 
 #Cyanide and Happiness
-CHOLD=`cat saved_data/ch`
+CHOLD=`cat $BASEDIR/saved_data/ch`
 CHNEW=`curl -s http://explosm.net/ |grep 'files.explosm.net/comics' |cut -d'"' -f6 |cut -d'?' -f1 |sed 's/^..//' |sed 's/^/http:\/\//'`
 if [ "$CHOLD" == "$CHNEW" ];then
   echo "Cyanide Same"
 else
-  echo $CHNEW >saved_data/ch
-  wget -O images/ch.png $CHNEW >/dev/null 2>&1
+  echo $CHNEW >$BASEDIR/saved_data/ch
+  wget -O $BASEDIR/images/ch.png $CHNEW >/dev/null 2>&1
 fi
 
 
 
 #The Oatmeal
-OMOLD=`cat saved_data/om`
+OMOLD=`cat $BASEDIR/saved_data/om`
 OMNEW=`curl -s http://theoatmeal.com/comics |grep -A1 bg_comic |head -n2 |cut -d'"' -f2 |tail -n 1 |sed 's/^/http:\/\/theoatmeal.com/' |xargs curl -s  |grep -A13 meat |tail -n 1 |cut -d'"' -f6`
 if [ "$OMOLD" == "$OMNEW" ];then
   echo "Oatmeal Same"
 else
-  echo $OMNEW >saved_data/om
-  wget -O images/om.png $OMNEW >/dev/null 2>&1
+  echo $OMNEW >$BASEDIR/saved_data/om
+  wget -O $BASEDIR/images/om.png $OMNEW >/dev/null 2>&1
 fi
 
 
 
 #SMBC
-SMBCOLD=`cat saved_data/smbc`
+SMBCOLD=`cat $BASEDIR/saved_data/smbc`
 SMBCNEW=`curl -s http://www.smbc-comics.com/ |grep 'comics/../comics/' |head -n 1 |sed 's/^.*src/src/' |cut -d'"' -f2 |sed 's/^/http:\/\/www.smbc-comics.com\//'`
 if [ "$SMBCOLD" == "$SMBCNEW" ];then
   echo "SMBC Same"
 else
-  echo $SMBCNEW >saved_data/smbc
-  wget -O images/smbc.png $SMBCNEW >/dev/null 2>&1
+  echo $SMBCNEW >$BASEDIR/saved_data/smbc
+  wget -O $BASEDIR/images/smbc.png $SMBCNEW >/dev/null 2>&1
 fi
 
 
 
 #Dark Legacy
-DLCURRENT=`cat saved_data/dl`
+DLCURRENT=`cat $BASEDIR/saved_data/dl`
 DLNEW=$((DLCURRENT + 1))
 DLURL="http://darklegacycomics.com/comics/$DLNEW.jpg"
 if 404test $DLURL;then
-  wget -O images/dl.jpg $DLURL >/dev/null 2>&1
-  echo $DLNEW > saved_data/dl
+  wget -O $BASEDIR/images/dl.jpg $DLURL >/dev/null 2>&1
+  echo $DLNEW > $BASEDIR/saved_data/dl
 fi
 
 
 
 #Diesel Sweeties
-DSOLD=`cat saved_data/ds`
+DSOLD=`cat $BASEDIR/saved_data/ds`
 DSNEW=`curl -s http://www.dieselsweeties.com/ |grep xomic |head -n1 |sed 's/^.*src=//' |cut -d'"' -f2 |sed 's/^/http:\/\/www.dieselsweeties.com/'`
 if [ "$DSOLD" == "$DSNEW" ];then
   echo "Diesel Sweeties Same"
 else
-  echo $DSNEW >saved_data/ds
-  wget -O images/ds.png $DSNEW >/dev/null 2>&1
+  echo $DSNEW >$BASEDIR/saved_data/ds
+  wget -O $BASEDIR/images/ds.png $DSNEW >/dev/null 2>&1
 fi
 
 
 
 #PHD Comics
-PHDOLD=`cat saved_data/phd`
+PHDOLD=`cat $BASEDIR/saved_data/phd`
 PHDNEW=`curl -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" http://phdcomics.com/comics.php |grep '/comics/archive/' |head -n1 |cut -d'"' -f4`
 if [ "$PHDOLD" == "$PHDNEW" ];then
   echo "PHD Same"
 else
-  echo $PHDNEW >saved_data/phd
-  wget -U 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0' -O images/phd.gif $PHDNEW >/dev/null 2>&1
+  echo $PHDNEW >$BASEDIR/saved_data/phd
+  wget -U 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0' -O $BASEDIR/images/phd.gif $PHDNEW >/dev/null 2>&1
 fi
 
 
 
 #Commit Strip
-CSOLD=`cat saved_data/cs`
+CSOLD=`cat $BASEDIR/saved_data/cs`
 CSNEW=`curl -s http://www.commitstrip.com/en/? |grep og:url |cut -d'"' -f4 |xargs curl -s |grep -A1 '"entry-content' |tail -n1 |cut -d'"' -f2`
 if [ "$CSOLD" == "$CSNEW" ];then
   echo "Commit Strip Same"
 else
-  echo $CSNEW >saved_data/cs
-  wget -O images/cs.jpg $CSNEW >/dev/null 2>&1
+  echo $CSNEW >$BASEDIR/saved_data/cs
+  wget -O $BASEDIR/images/cs.jpg $CSNEW >/dev/null 2>&1
 fi
 
 
 
 #User Friendly
-UFOLD=`cat saved_data/uf`
+UFOLD=`cat $BASEDIR/saved_data/uf`
 UFNEW=`curl -s http://www.userfriendly.org/ |grep 'Latest Strip' |cut -d'"' -f10`
 if [ "$UFOLD" == "$UFNEW" ];then
   echo "User FriendlySame"
 else
-  echo $UFNEW >saved_data/uf
-  wget -O images/uf.gif $UFNEW >/dev/null 2>&1
+  echo $UFNEW >$BASEDIR/saved_data/uf
+  wget -O $BASEDIR/images/uf.gif $UFNEW >/dev/null 2>&1
 fi
 
 
 
 
 #By The Book
-BTBOLD=`cat saved_data/btb`
+BTBOLD=`cat $BASEDIR/saved_data/btb`
 BTBNEW=`curl -s http://www.btbcomic.com/ |grep -A1 'id="comic"' |tail -n1 |cut -d'"' -f2`
 if [ "$BTBOLD" == "$BTBNEW" ];then
   echo "By The Book"
 else
-  echo $BTBNEW >saved_data/btb
-  wget -O images/btb.jpg $BTBNEW >/dev/null 2>&1
+  echo $BTBNEW >$BASEDIR/saved_data/btb
+  wget -O $BASEDIR/images/btb.jpg $BTBNEW >/dev/null 2>&1
 fi
 
 
@@ -352,10 +362,10 @@ img.resize90{
 
 <font size="6">
 
-' >index.html
+' >$BASEDIR/index.html
 
 
-for image in $( ls -t images);do
+for image in $( ls -t $BASEDIR/images);do
   
   if [ "$image" == "d2.jpg" ];then
     echo '
@@ -366,7 +376,7 @@ for image in $( ls -t images);do
     <font size="2">'$D2MO'</font>
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "dilbert.gif" ];then
@@ -378,7 +388,7 @@ for image in $( ls -t images);do
     <br><br><br>
 
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "dr.png" ];then
@@ -389,7 +399,7 @@ for image in $( ls -t images);do
     <img class="resize90" src="images/dr.png">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
   
   if [[ "$image" == *"lfg"* ]];then
@@ -400,7 +410,7 @@ for image in $( ls -t images);do
     <img src="images/'$image'">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
   
   if [ "$image" == "oglaf.jpg" ];then
@@ -411,7 +421,7 @@ for image in $( ls -t images);do
     <img src="images/oglaf.jpg">
     <br><br><br>
 
-    ' >>index.html 
+    ' >>$BASEDIR/index.html 
  fi
   
   if [ "$image" == "oots.png" ];then
@@ -423,7 +433,7 @@ for image in $( ls -t images);do
     <br><br><br>
 
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "pa.jpg" ];then
@@ -434,7 +444,7 @@ for image in $( ls -t images);do
     <img src="images/pa.jpg" width="'$PAWIDTH'">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "qc.png" ];then
@@ -445,7 +455,7 @@ for image in $( ls -t images);do
     <img src="images/qc.png">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "satw.png" ];then
@@ -456,7 +466,7 @@ for image in $( ls -t images);do
     <img src="images/satw.png">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "xkcd.png" ];then
@@ -473,7 +483,7 @@ for image in $( ls -t images);do
     </font>
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "mgmt.jpg" ];then
@@ -484,7 +494,7 @@ for image in $( ls -t images);do
     <img src="images/mgmt.jpg">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "ma3.png" ];then
@@ -495,7 +505,7 @@ for image in $( ls -t images);do
     <img src="images/ma3.png">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "mf.jpg" ];then
@@ -506,7 +516,7 @@ for image in $( ls -t images);do
     <img src="images/mf.jpg">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "ch.png" ];then
@@ -517,7 +527,7 @@ for image in $( ls -t images);do
     <img src="images/ch.png">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "om.png" ];then
@@ -528,7 +538,7 @@ for image in $( ls -t images);do
     <img src="images/om.png">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "smbc.png" ];then
@@ -539,7 +549,7 @@ for image in $( ls -t images);do
     <img src="images/smbc.png">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "dl.jpg" ];then
@@ -550,7 +560,7 @@ for image in $( ls -t images);do
     <img src="images/dl.jpg">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "ds.png" ];then
@@ -561,7 +571,7 @@ for image in $( ls -t images);do
     <img class="resize90" src="images/ds.png">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "phd.gif" ];then
@@ -572,7 +582,7 @@ for image in $( ls -t images);do
     <img src="images/phd.gif">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "cs.jpg" ];then
@@ -583,7 +593,7 @@ for image in $( ls -t images);do
     <img src="images/cs.jpg">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "uf.gif" ];then
@@ -594,7 +604,7 @@ for image in $( ls -t images);do
     <img src="images/uf.gif">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
   if [ "$image" == "btb.jpg" ];then
@@ -605,7 +615,7 @@ for image in $( ls -t images);do
     <img src="images/btb.jpg">
     <br><br><br>
 
-    ' >>index.html
+    ' >>$BASEDIR/index.html
   fi
 
 
@@ -620,4 +630,4 @@ echo '
 
 </body>
 </html>
-'>>index.html
+'>>$BASEDIR/index.html
