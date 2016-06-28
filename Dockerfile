@@ -8,5 +8,5 @@ COPY page_make.sh /root
 COPY nginx.conf /etc/nginx/
 COPY saved_data/* /root/saved_data/
 
-#ENTRYPOINT /root/entrypoint.sh
+CMD ["/root/entrypoint.sh"]
 
