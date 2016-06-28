@@ -1,0 +1,8 @@
+# Build
+docker build -t oli-webcomics .
+
+# Run
+docker run -p 8080:80 -d oli-webcomics /root/entrypoint.sh
+
+Once running, comics will be served on http://localhost:8080 and (with the committed defaults) updated every 4 hours (+ upto 2 hours randomness)
+
