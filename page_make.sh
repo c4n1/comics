@@ -240,12 +240,26 @@ fi
 
 #The Oatmeal
 OMOLD=`cat $BASEDIR/saved_data/om`
-OMNEW=`curl -s http://theoatmeal.com/comics |grep -A1 bg_comic |head -n2 |cut -d'"' -f2 |tail -n 1 |sed 's/^/http:\/\/theoatmeal.com/' |xargs curl -s  |grep -A13 meat |tail -n 1 |cut -d'"' -f6`
+OMNEW=`curl -s http://theoatmeal.com/comics |grep -A1 bg_comic |head -n2 |cut -d'"' -f2 |tail -n 1 |sed 's/^/http:\/\/theoatmeal.com/'`
 if [ "$OMOLD" == "$OMNEW" ];then
   echo "Oatmeal Same"
 else
   echo $OMNEW >$BASEDIR/saved_data/om
-  wget -O $BASEDIR/images/om.png $OMNEW >/dev/null 2>&1
+  curl -s $OMNEW |grep 'theoatmeal-img/comics' | grep panel > /dev/null
+  rm -Rf tmp_images
+  mkdir tmp_images
+  if [ $? -eq 0 ]; then
+    #This is a single panel comic (e.g. http://theoatmeal.com/comics/dog_speeds)
+    wget -O tmp_images/0.png `curl -s $OMNEW |grep -A13 meat |tail -n 1 |cut -d'"' -f4`
+  else
+    #This is a multi panel comic (e.g. http://theoatmeal.com/comics/dogs_as_men2)
+    i=0
+    curl -s $OMNEW |grep 'theoatmeal-img/comics' | cut -d'"' -f2 | while read img_url; do 
+      wget -O tmp_images/$i.png $img_url
+      i=$((i+1))
+    done
+  fi
+  convert -gravity center -append `find tmp_images -type f | sort -n` $BASEDIR/images/om.png
 fi
 
 
