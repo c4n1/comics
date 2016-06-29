@@ -246,20 +246,20 @@ if [ "$OMOLD" == "$OMNEW" ];then
 else
   echo $OMNEW >$BASEDIR/saved_data/om
   curl -s $OMNEW |grep 'theoatmeal-img/comics' | grep panel > /dev/null
-  rm -Rf tmp_images
-  mkdir tmp_images
+  rm -Rf /tmp/oatmeal_images
+  mkdir /tmp/oatmeal_images
   if [ $? -eq 0 ]; then
     #This is a single panel comic (e.g. http://theoatmeal.com/comics/dog_speeds)
-    wget -O tmp_images/0.png `curl -s $OMNEW |grep -A13 meat |tail -n 1 |cut -d'"' -f4`
+    wget -O /tmp/oatmeal_images/0.png `curl -s $OMNEW |grep -A13 meat |tail -n 1 |cut -d'"' -f4` &>/dev/null
   else
     #This is a multi panel comic (e.g. http://theoatmeal.com/comics/dogs_as_men2)
     i=0
     curl -s $OMNEW |grep 'theoatmeal-img/comics' | cut -d'"' -f2 | while read img_url; do 
-      wget -O tmp_images/$i.png $img_url
+      wget -O /tmp/oatmeal_images/$i.png $img_url
       i=$((i+1))
     done
   fi
-  convert -gravity center -append `find tmp_images -type f | sort -n` $BASEDIR/images/om.png
+  convert -gravity center -append `find /tmp/oatmeal_images -type f | sort -n` $BASEDIR/images/om.png
 fi
 
 
@@ -340,10 +340,22 @@ fi
 BTBOLD=`cat $BASEDIR/saved_data/btb`
 BTBNEW=`curl -s http://www.btbcomic.com/ |grep -A1 'id="comic"' |tail -n1 |cut -d'"' -f2`
 if [ "$BTBOLD" == "$BTBNEW" ];then
-  echo "By The Book"
+  echo "By The Book Same"
 else
   echo $BTBNEW >$BASEDIR/saved_data/btb
   wget -O $BASEDIR/images/btb.jpg $BTBNEW >/dev/null 2>&1
+fi
+
+
+#Oh Joy Sex Toy
+OJSTOLD=`cat $BASEDIR/saved_data/OJST`
+OJSTNEW=`curl -s http://www.ohjoysextoy.com/ |grep 'div id="comic-1"' |cut -d'"' -f8`
+if [ "$OJSTOLD" == "$OJSTNEW" ];then
+  echo "Oh Joy Sex Toy Same"
+else
+  echo $OJSTNEW >$BASEDIR/saved_data/OJST
+  OJSTIMGTYPE=`echo "$OJSTNEW" |cut -d. -f4`
+  wget -O $BASEDIR/images/OJST.$OJSTIMGTYPE $OJSTNEW >/dev/null 2>&1
 fi
 
 
@@ -632,7 +644,16 @@ for image in $( ls -t $BASEDIR/images);do
     ' >>$BASEDIR/index.html
   fi
 
+  if [[ "$image" == *"OJST"* ]];then
+    echo '
 
+    Oh Joy Sex Toy
+    <br>
+    <img src="images/'$image'">
+    <br><br><br>
+
+    ' >>$BASEDIR/index.html
+  fi
 
 
 
