@@ -83,7 +83,7 @@ LFGNEWNUM=$(($LFGOLD +1))
 LFGNEW="http://www.lfg.co/page/$LFGNEWNUM/"
 if 404test $LFGNEW;then
   echo $LFGNEWNUM > $BASEDIR/saved_data/lfg
-  LFGIMG=`curl -s $LFGNEW |grep -A1 '<div id="comic">' |tail -n1 |cut -d'"' -f2`
+  LFGIMG=`curl -L -s $LFGNEW |grep -A2 '<div id="comic">' |tail -n1 |cut -d'"' -f2`
   LFGIMGTYPE=`echo $LFGIMG |cut -d'.' -f4`
   rm -f $BASEDIR/images/lfg*
   wget -O $BASEDIR/images/lfg.$LFGIMGTYPE $LFGIMG >/dev/null 2>&1
@@ -266,7 +266,7 @@ fi
 
 #SMBC
 SMBCOLD=`cat $BASEDIR/saved_data/smbc`
-SMBCNEW=`curl -s http://www.smbc-comics.com/ |grep 'comics/../comics/' |head -n 1 |sed 's/^.*src/src/' |cut -d'"' -f2 |sed 's/^/http:\/\/www.smbc-comics.com\//'`
+SMBCNEW=`curl -s http://www.smbc-comics.com/ |grep cc-comicbody |cut -d\" -f6`
 if [ "$SMBCOLD" == "$SMBCNEW" ];then
   echo "SMBC Same"
 else
@@ -358,6 +358,18 @@ else
   wget -O $BASEDIR/images/OJST.$OJSTIMGTYPE $OJSTNEW >/dev/null 2>&1
 fi
 
+
+
+#Between Failures
+BFOLD=`cat $BASEDIR/saved_data/BF`
+BFNEW=`curl -s http://betweenfailures.com/ |grep -A1 'class="webcomic-image"' |tail -n1 |cut -d'"' -f6`
+if [ "$BFOLD" == "$BFNEW" ];then
+  echo "Between Failures Same"
+else
+  echo $BFNEW >$BASEDIR/saved_data/BF
+  BFIMGTYPE=`echo "$BFNEW" |cut -d. -f3`
+  wget -O $BASEDIR/images/BF.$BFIMGTYPE $BFNEW >/dev/null 2>&1
+fi
 
 
 
@@ -655,7 +667,16 @@ for image in $( ls -t $BASEDIR/images);do
     ' >>$BASEDIR/index.html
   fi
 
+  if [[ "$image" == *"BF"* ]];then
+    echo '
 
+    Between Failures
+    <br>
+    <img src="images/'$image'">
+    <br><br><br>
+
+    ' >>$BASEDIR/index.html
+  fi
 
 done
 
