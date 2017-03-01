@@ -92,7 +92,7 @@ fi
 
 
 #XKCD
-curl -s xkcd.com > /tmp/xkcd.html
+curl -s https://xkcd.com > /tmp/xkcd.html
 XKCDIMG=`cat /tmp/xkcd.html |grep -A 1 'id="comic"' |tail -n1 |cut -d'"' -f2 |cut -c 3- `
 XKCDTITLE=`cat /tmp/xkcd.html |grep title |grep xkcd |head -n1 |cut -d":" -f2 |cut -c2- |cut -d"<" -f1`
 XKCDMO=`cat /tmp/xkcd.html |grep title |grep xkcd |cut -d'"' -f4`
@@ -245,9 +245,9 @@ if [ "$OMOLD" == "$OMNEW" ];then
   echo "Oatmeal Same"
 else
   echo $OMNEW >$BASEDIR/saved_data/om
-  curl -s $OMNEW |grep 'theoatmeal-img/comics' | grep panel > /dev/null
   rm -Rf /tmp/oatmeal_images
   mkdir /tmp/oatmeal_images
+  curl -s $OMNEW |grep 'theoatmeal-img/comics' | grep panel > /dev/null
   if [ $? -eq 0 ]; then
     #This is a single panel comic (e.g. http://theoatmeal.com/comics/dog_speeds)
     wget -O /tmp/oatmeal_images/0.png `curl -s $OMNEW |grep -A13 meat |tail -n 1 |cut -d'"' -f4` &>/dev/null
