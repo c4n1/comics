@@ -117,7 +117,9 @@ fi
 
 
 #SATW
-SATWIMG=`curl -s https://satwcomic.com/the-world |grep -A 9 "1 of" |head -n 8 |tail -n 1 |cut -d'"' -f 4 |sed 's,150_thumb/,,g'`
+SATWP1=`curl -s https://satwcomic.com/ |grep "View latest comic" |cut -d'"' -f2`
+SATWIMG=`curl -s https://satwcomic.com/remember-your-safeword |grep '<center><a href="https://satwcomic.com' |cut -d'"' -f4`
+#SATWIMG=`curl -s https://satwcomic.com/the-world |grep -A 9 "1 of" |head -n 8 |tail -n 1 |cut -d'"' -f 4 |sed 's,150_thumb/,,g'`
 SATWOLD=`cat $BASEDIR/saved_data/satw`
 if [ "$SATWOLD" == "$SATWIMG" ];then
   echo "SATW Same"
