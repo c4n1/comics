@@ -118,7 +118,7 @@ fi
 
 #SATW
 SATWP1=`curl -s https://satwcomic.com/ |grep "View latest comic" |cut -d'"' -f2`
-SATWIMG=`curl -s https://satwcomic.com/remember-your-safeword |grep '<center><a href="https://satwcomic.com' |cut -d'"' -f4`
+SATWIMG=`curl -s $SATWP1 |grep '<center><a href="https://satwcomic.com' |cut -d'"' -f4`
 #SATWIMG=`curl -s https://satwcomic.com/the-world |grep -A 9 "1 of" |head -n 8 |tail -n 1 |cut -d'"' -f 4 |sed 's,150_thumb/,,g'`
 SATWOLD=`cat $BASEDIR/saved_data/satw`
 if [ "$SATWOLD" == "$SATWIMG" ];then
@@ -143,8 +143,8 @@ fi
 
 #D20 Monkey
 D2IMGOLD=`cat $BASEDIR/saved_data/d2`
-D2IMG=`curl -s http://www.d20monkey.com/ |grep jpg |sed '2q;d' |cut -d'"' -f2`
-D2MO=`curl -s http://www.d20monkey.com/ |grep jpg |sed '2q;d' |cut -d'"' -f4`
+D2IMG=`curl -s http://www.d20monkey.com/ |grep -A1 'id="comic"' |grep -v 'id="comic"' |cut -d\" -f2`
+D2MO=`curl -s http://www.d20monkey.com/ |grep -A1 'id="comic"' |grep -v 'id="comic"' |cut -d\" -f4`
 if [ "$D2IMG" == "$D2IMGOLD" ];then
   echo "D20 Monkey Same"
 else
@@ -171,7 +171,7 @@ fi
 
 #Oglaf
 OGLAFOLD=`cat $BASEDIR/saved_data/oglaf`
-OGLAFNEW=`curl -s http://oglaf.com/ |head -n 1 |rev |cut -d '"' -f 2 |rev`
+OGLAFNEW=`curl -s http://oglaf.com/ |grep 'id="strip' |cut -d\" -f4`
 if [ "$OGLAFNEW" == "$OGLAFOLD" ];then
   echo "Oglaf Same"
 else
@@ -207,7 +207,7 @@ fi
 
 #MA3
 MA3OLD=`cat $BASEDIR/saved_data/ma3`
-MA3NEW=`curl -s -L http://www.ma3comic.com |grep 'http://zii.ma3comic.com/comics/' |cut -d'"' -f2`
+MA3NEW=`curl -s -L http://www.ma3comic.com |grep 'id="cc-comic"' |cut -d\" -f6`
 if [ "$MA3OLD" == "$MA3NEW" ];then
   echo "MA3 Same"
 else
@@ -268,7 +268,7 @@ fi
 
 #SMBC
 SMBCOLD=`cat $BASEDIR/saved_data/smbc`
-SMBCNEW=`curl -s http://www.smbc-comics.com/ |grep cc-comicbody |cut -d\" -f6`
+SMBCNEW=`curl -s https://www.smbc-comics.com/ |grep cc-comicbody |cut -d\" -f6 |sed 's/^/https:\/\/www.smbc-comics.com/'`
 if [ "$SMBCOLD" == "$SMBCNEW" ];then
   echo "SMBC Same"
 else
@@ -303,7 +303,7 @@ fi
 
 #PHD Comics
 PHDOLD=`cat $BASEDIR/saved_data/phd`
-PHDNEW=`curl -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" http://phdcomics.com/comics.php |grep '/comics/archive/' |head -n1 |cut -d'"' -f4`
+PHDNEW=`curl -s -A "Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0" http://phdcomics.com/comics.php |grep '/comics/archive/' |head -n1 |cut -d'"' -f4 |cut -d\' -f4`
 if [ "$PHDOLD" == "$PHDNEW" ];then
   echo "PHD Same"
 else
@@ -351,7 +351,7 @@ fi
 
 #Oh Joy Sex Toy
 OJSTOLD=`cat $BASEDIR/saved_data/OJST`
-OJSTNEW=`curl -s http://www.ohjoysextoy.com/ |grep 'div id="comic-1"' |cut -d'"' -f8`
+OJSTNEW=`curl -s https://www.ohjoysextoy.com/ |grep 'div id="comic-1"' |cut -d'"' -f8`
 if [ "$OJSTOLD" == "$OJSTNEW" ];then
   echo "Oh Joy Sex Toy Same"
 else
